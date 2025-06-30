@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import { validatePassword } from 'val-pass';
 import  toast from 'react-hot-toast';
+import axios from 'axios';
+import empServices from '../../service/empServices';
+import { Link } from 'react-router-dom';
+
 // Imported react icons
 import { FaRegUser } from "react-icons/fa";
 import { FaRegUserCircle } from "react-icons/fa";
@@ -64,7 +68,9 @@ const Register = () => {
 
   const handelSubmit = (e) => {
     e.preventDefault()
+
     console.log(formData)
+
     let {name, userName, email, password} = formData
     if (!name || !userName || !email || !password ) {
       toast.error("All fields are Mandatory")
@@ -79,17 +85,34 @@ const Register = () => {
       toast.error("Password does not match")
       return
     }
-    console.log(formData)
+    // console.log(formData)
+
+
+  (async() => {
+    try {
+      let data = await empServices.regiUser(formData)
+      if (data.status == 201) {
+        toast.success("Registration Successful!!")
+        Navigate("/")
+
+      } else {
+        toast.error("Something went Wrong")
+        return
+      }
+    } catch {
+      toast.error("Something went Wrong")
+      return
+    }
+  })()
   }
 
-  
   
 
 
   return (
     <div className =' size-full flex justify-center items-center bg-linear-to-l from-[#278783] to-[#ffedb0]'>
 
-      <form action = "" 
+      <form action = "" method = 'POST'
         className = ' h-3/4 w-1/2 flex flex-col gap-y-5 rounded-2xl bg-linear-to-r from-[#607EBC] to-[#D1E0D7] max-sm:w-[80%] max-sm:h-[70%] overflow-y-scroll '
         onSubmit = {handelSubmit}>
       
@@ -167,7 +190,7 @@ const Register = () => {
 
         { 
           !matched && (
-            <div className = 'w-3/4  flex self-center'>
+            <div className = 'w-3/4  flex self-center text-red-600'>
               * Password does not match
             </div>
           )
@@ -177,6 +200,9 @@ const Register = () => {
           <button type = 'submit' className = 'size-full p-1.5 font-extrabold  text-s tracking-widest text-black '>Register</button>
         </div>
 
+        {/* <div className = 'mb-1 flex w-3/4 justify-center self-center '>
+          <Link to = 'login'>If registered already, Click here to Login</Link>
+        </div> */}
       </form>
     </div>
   )
